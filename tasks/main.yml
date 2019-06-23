@@ -1,2 +1,29 @@
 ---
 # tasks file for pizero-usb-stem
+
+- name: Stat for pi mount point
+  stat:
+    path: "{{ pizero_mount_point }}/config.txt"
+  register: pimount
+
+- name: Fail when mount not found
+  fail:
+    msg: "Whoops! config.txt not found in pi mount point."
+  when: "pimount.stat.exists == False"
+
+- name: Configure dtoverlay in config.txt
+  lineinfile:
+    dest: "{{ pizero_mount_point }}/config.txt"
+    regexp: '^dtoverlay='
+    line: 'dtoverlay=dwc2'
+
+- name: Configure cmdline
+  replace:
+    dest: "{{ pizero_mount_point }}/cmdline.txt"
+    regexp: '(.*)rootwait quiet(.*)'
+    replace: '\1rootwait modules-load=dwc2,g_ether quiet\2'
+ 
+- name: Create ssh load file
+  file:
+    path: "{{ pizero_mount_point }}/ssh"
+    state: touch

@@ -1,2 +1,5 @@
 ---
 # defaults file for pizero-usb-stem
+
+# Location the raspbery pi disk is mounted
+pizero_mount_point: /mnt/pi1
